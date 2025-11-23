@@ -6,6 +6,7 @@ import { ArrowLeft, Pill, FileText, Brain, ClipboardList, Save } from 'lucide-re
 import { MedicationsTab } from '../components/workspace/MedicationsTab';
 import { SymptomsTab } from '../components/workspace/SymptomsTab';
 import { AISummaryTab } from '../components/workspace/AISummaryTab';
+import { ReportDraftTab } from '../components/workspace/ReportDraftTab';
 import { format } from 'date-fns';
 
 type TabId = 'medications' | 'symptoms' | 'ai-summary' | 'report';
@@ -123,11 +124,7 @@ export function ReviewWorkspacePage() {
           <AISummaryTab reviewId={review.id} />
         )}
         {activeTab === 'report' && (
-          <Card className="p-8 text-center">
-            <FileText className="mx-auto h-12 w-12 text-muted-foreground" />
-            <h3 className="mt-4 text-lg font-medium">Report Draft</h3>
-            <p className="mt-2 text-muted-foreground">Coming in Phase 9</p>
-          </Card>
+          <ReportDraftTab reviewId={review.id} onSave={() => setLastSaved(new Date())} />
         )}
       </div>
     </div>

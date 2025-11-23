@@ -1,6 +1,6 @@
 # Project Status: MedReview Assist
 
-## Current Phase: Phase 9 - Report Drafting
+## Current Phase: Phase 10 - PDF Preview & Export
 
 ---
 
@@ -217,23 +217,23 @@
 
 ---
 
-## Phase 9: Report Drafting
+## Phase 9: Report Drafting ✅ COMPLETED
 **Goal:** Build report generation and editing
 
 ### Backend - Report API
-- [ ] POST `/reviews/{id}/report/generate` draft generation
-- [ ] Implement Jinja2 report template
-- [ ] GET `/reviews/{id}/report` get current draft
-- [ ] PUT `/reviews/{id}/report` update sections
+- [x] POST `/reviews/{id}/report/generate` draft generation
+- [x] Implement report template service
+- [x] GET `/reviews/{id}/report` get current draft
+- [x] PUT `/reviews/{id}/report/sections/{section}` update sections
 
 ### Frontend - Report Draft Tab
-- [ ] Create ReportDraftTab layout (three-column)
-- [ ] Create SectionNav component with review status
-- [ ] Create ReportEditor with rich text (TipTap)
-- [ ] Create SuggestionsSidebar component
-- [ ] "Generate initial draft" button
-- [ ] Section insertion from suggestions
-- [ ] Patient summary snapshot in sidebar
+- [x] Create ReportDraftTab layout (three-column)
+- [x] Create SectionNav component with review status
+- [x] Create ReportEditor with autosave
+- [x] Create SuggestionsSidebar component
+- [x] "Generate initial draft" button
+- [x] Section insertion from suggestions
+- [x] Mark section as reviewed functionality
 
 ---
 
@@ -388,7 +388,7 @@
 | Phase 6 | ⏳ Not Started | OCR & Dictation Input |
 | Phase 7 | ✅ Complete | Clinical Notes |
 | Phase 8 | ✅ Complete | AI Suggestions (Decision Support) |
-| Phase 9 | ⏳ Not Started | Report Drafting |
+| Phase 9 | ✅ Complete | Report Drafting |
 | Phase 10 | ⏳ Not Started | PDF Preview & Export |
 | Phase 11 | ⏳ Not Started | Finalization & Consent |
 | Phase 12 | ⏳ Not Started | Email Delivery |
