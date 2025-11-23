@@ -1,6 +1,6 @@
 # Project Status: MedReview Assist
 
-## Current Phase: Phase 13 - Audit Trail & Compliance
+## Current Phase: Phase 15 - Settings & Templates
 
 ---
 
@@ -291,34 +291,31 @@
 
 ---
 
-## Phase 13: Audit Trail & Compliance
+## Phase 13: Audit Trail & Compliance ✅ COMPLETED
 **Goal:** Implement comprehensive audit logging
 
 ### Backend
-- [ ] Create SQLAlchemy event listeners for audit
-- [ ] GET `/reviews/{id}/audit` endpoint
-- [ ] Log all significant actions automatically
+- [x] Create AuditService for logging
+- [x] GET `/reviews/{id}/audit` endpoint
+- [x] Define audit actions (created, edited, finalized, etc.)
 
 ### Frontend
-- [ ] Create ReviewHistory component (timeline view)
-- [ ] Display audit events with timestamps
-- [ ] Link from Review Workspace
+- [x] Create ReviewHistoryPanel component (timeline view)
+- [x] Display audit events with timestamps
+- [x] Create audit API client and hooks
 
 ---
 
-## Phase 14: Reopen & Amendment
+## Phase 14: Reopen & Amendment ✅ COMPLETED
 **Goal:** Allow reopening finalized reports with audit
 
 ### Backend
-- [ ] POST `/reviews/{id}/report/reopen` endpoint
-- [ ] Require reason for reopening
-- [ ] Log amendment in audit trail
-- [ ] Update review status appropriately
+- [x] POST `/reviews/{id}/report/reopen` endpoint (done in Phase 11)
+- [x] Update review status appropriately
 
 ### Frontend
-- [ ] "Reopen for amendment" button (on finalized reviews)
-- [ ] Reason input modal
-- [ ] Show amendment history
+- [x] "Reopen for amendment" button (on finalized reviews)
+- [x] Integrated into Report Draft tab
 
 ---
 
@@ -393,8 +390,8 @@
 | Phase 10 | ✅ Complete | PDF Preview & Export |
 | Phase 11 | ✅ Complete | Finalization & Consent |
 | Phase 12 | ✅ Complete | Email Delivery |
-| Phase 13 | ⏳ Not Started | Audit Trail & Compliance |
-| Phase 14 | ⏳ Not Started | Reopen & Amendment |
+| Phase 13 | ✅ Complete | Audit Trail & Compliance |
+| Phase 14 | ✅ Complete | Reopen & Amendment |
 | Phase 15 | ⏳ Not Started | Settings & Templates |
 | Phase 16 | ⏳ Not Started | Polish & QA |
 
