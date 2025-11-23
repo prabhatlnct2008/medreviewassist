@@ -1,9 +1,9 @@
-import { useState } from 'react';
+import { useState, useRef, useCallback } from 'react';
 import { useMedications } from '@/hooks/useReviews';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { reviewsApi, MedicationCreate } from '@/api/reviews';
-import { Button, Input, Card, Spinner } from '@/components/ui';
-import { Plus, Trash2, Edit2, Check, X, ClipboardPaste } from 'lucide-react';
+import { Button, Input, Card, Spinner, toast } from '@/components/ui';
+import { Plus, Trash2, Edit2, Check, X, ClipboardPaste, Camera, Mic, MicOff, Upload } from 'lucide-react';
 import { Medication } from '@/types';
 
 interface MedicationsTabProps {
@@ -16,8 +16,15 @@ export function MedicationsTab({ reviewId, onSave }: MedicationsTabProps) {
   const { data: medications, isLoading } = useMedications(reviewId);
   const [showAddForm, setShowAddForm] = useState(false);
   const [showBulkPaste, setShowBulkPaste] = useState(false);
+  const [showOcrUpload, setShowOcrUpload] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [bulkText, setBulkText] = useState('');
+
+  // OCR and Dictation state
+  const [isRecording, setIsRecording] = useState(false);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const audioChunksRef = useRef<Blob[]>([]);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const addMutation = useMutation({
     mutationFn: (data: MedicationCreate) => reviewsApi.addMedication(reviewId, data),
@@ -60,6 +67,100 @@ export function MedicationsTab({ reviewId, onSave }: MedicationsTabProps) {
     },
   });
 
+  // OCR mutation
+  const ocrMutation = useMutation({
+    mutationFn: (file: File) => reviewsApi.ocrMedications(reviewId, file),
+    onSuccess: async (parsed: any[]) => {
+      if (parsed.length > 0) {
+        const meds: MedicationCreate[] = parsed.map((p) => ({
+          drug_name: p.drug_name,
+          strength: p.strength,
+          frequency: p.frequency,
+          route: 'oral',
+        }));
+        await bulkAddMutation.mutateAsync(meds);
+        toast.success(`Added ${meds.length} medications from image`);
+      } else {
+        toast.warning('No medications found in image');
+      }
+      setShowOcrUpload(false);
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.detail || 'Failed to process image');
+    },
+  });
+
+  // Dictation mutation
+  const dictateMutation = useMutation({
+    mutationFn: (audioBlob: Blob) => reviewsApi.dictateMedications(reviewId, audioBlob),
+    onSuccess: async (parsed: any[]) => {
+      if (parsed.length > 0) {
+        const meds: MedicationCreate[] = parsed.map((p) => ({
+          drug_name: p.drug_name,
+          strength: p.strength,
+          frequency: p.frequency,
+          route: 'oral',
+        }));
+        await bulkAddMutation.mutateAsync(meds);
+        toast.success(`Added ${meds.length} medications from dictation`);
+      } else {
+        toast.warning('No medications found in audio');
+      }
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.detail || 'Failed to transcribe audio');
+    },
+  });
+
+  // Handle file upload for OCR
+  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      ocrMutation.mutate(file);
+    }
+  };
+
+  // Handle dictation recording
+  const startRecording = useCallback(async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const mediaRecorder = new MediaRecorder(stream);
+      mediaRecorderRef.current = mediaRecorder;
+      audioChunksRef.current = [];
+
+      mediaRecorder.ondataavailable = (event) => {
+        audioChunksRef.current.push(event.data);
+      };
+
+      mediaRecorder.onstop = () => {
+        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+        dictateMutation.mutate(audioBlob);
+        stream.getTracks().forEach(track => track.stop());
+      };
+
+      mediaRecorder.start();
+      setIsRecording(true);
+      toast.info('Recording... Click again to stop');
+    } catch (error) {
+      toast.error('Could not access microphone. Please check permissions.');
+    }
+  }, [dictateMutation]);
+
+  const stopRecording = useCallback(() => {
+    if (mediaRecorderRef.current && isRecording) {
+      mediaRecorderRef.current.stop();
+      setIsRecording(false);
+    }
+  }, [isRecording]);
+
+  const toggleRecording = () => {
+    if (isRecording) {
+      stopRecording();
+    } else {
+      startRecording();
+    }
+  };
+
   const handleParseBulk = async () => {
     const parsed = await parseMutation.mutateAsync(bulkText);
     if (parsed.length > 0) {
@@ -88,6 +189,36 @@ export function MedicationsTab({ reviewId, onSave }: MedicationsTabProps) {
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-semibold">Current Medications</h2>
           <div className="flex gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={toggleRecording}
+              className={isRecording ? 'bg-red-100 border-red-300' : ''}
+              disabled={dictateMutation.isPending}
+            >
+              {isRecording ? (
+                <MicOff className="mr-2 h-4 w-4 text-red-500" />
+              ) : (
+                <Mic className="mr-2 h-4 w-4" />
+              )}
+              {isRecording ? 'Stop' : 'Dictate'}
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={ocrMutation.isPending}
+            >
+              <Camera className="mr-2 h-4 w-4" />
+              {ocrMutation.isPending ? 'Processing...' : 'Scan Image'}
+            </Button>
+            <input
+              type="file"
+              ref={fileInputRef}
+              onChange={handleFileSelect}
+              accept="image/*"
+              className="hidden"
+            />
             <Button variant="outline" size="sm" onClick={() => setShowBulkPaste(!showBulkPaste)}>
               <ClipboardPaste className="mr-2 h-4 w-4" />
               Bulk Paste
@@ -203,9 +334,30 @@ export function MedicationsTab({ reviewId, onSave }: MedicationsTabProps) {
         )}
 
         <Card className="p-4">
-          <h3 className="font-medium mb-2">Quick Tips</h3>
+          <h3 className="font-medium mb-2">Input Methods</h3>
+          <ul className="text-sm text-muted-foreground space-y-2">
+            <li className="flex items-start gap-2">
+              <Mic className="h-4 w-4 mt-0.5 flex-shrink-0" />
+              <span><strong>Dictate:</strong> Click to record, speak your medications list, click again to stop</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <Camera className="h-4 w-4 mt-0.5 flex-shrink-0" />
+              <span><strong>Scan:</strong> Upload a photo of a medication list or prescription</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <ClipboardPaste className="h-4 w-4 mt-0.5 flex-shrink-0" />
+              <span><strong>Bulk Paste:</strong> Paste text from another source (one per line)</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <Plus className="h-4 w-4 mt-0.5 flex-shrink-0" />
+              <span><strong>Manual:</strong> Add medications one at a time with full details</span>
+            </li>
+          </ul>
+        </Card>
+
+        <Card className="p-4">
+          <h3 className="font-medium mb-2">Tips</h3>
           <ul className="text-sm text-muted-foreground space-y-1">
-            <li>• Enter one medication per line for bulk paste</li>
             <li>• Include strength and frequency when possible</li>
             <li>• Mark ceased medications to track history</li>
             <li>• Add indications for better AI analysis</li>
