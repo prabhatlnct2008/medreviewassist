@@ -100,6 +100,24 @@ export const reviewsApi = {
     return response.data;
   },
 
+  ocrMedications: async (reviewId: string, file: File) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    const response = await apiClient.post(`/reviews/${reviewId}/medications/ocr`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+    return response.data;
+  },
+
+  dictateMedications: async (reviewId: string, audioBlob: Blob, filename = 'audio.webm') => {
+    const formData = new FormData();
+    formData.append('file', audioBlob, filename);
+    const response = await apiClient.post(`/reviews/${reviewId}/medications/dictate`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+    return response.data;
+  },
+
   // Clinical Notes
   getClinicalNotes: async (reviewId: string) => {
     const response = await apiClient.get<ClinicalNote[]>(`/reviews/${reviewId}/notes`);

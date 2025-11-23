@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File
 from sqlalchemy.orm import Session
 from typing import List
 from app.core.database import get_db
@@ -13,6 +13,8 @@ from app.schemas import (
     MessageResponse,
 )
 from app.api.deps import get_current_user
+from app.services.ocr_service import OCRService, OCRError
+from app.services.transcription_service import TranscriptionService, TranscriptionError
 
 router = APIRouter(prefix="/reviews/{review_id}/medications", tags=["Medications"])
 
@@ -230,3 +232,110 @@ def delete_medication(
     db.commit()
 
     return MessageResponse(message="Medication deleted successfully")
+
+
+@router.post("/ocr", response_model=List[ParsedMedication])
+async def ocr_medications(
+    review_id: str,
+    file: UploadFile = File(...),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Extract medications from an uploaded image using OCR.
+
+    Supports common image formats: JPEG, PNG, TIFF, BMP.
+    """
+    get_review_or_404(review_id, current_user.id, db)
+
+    # Validate file type
+    allowed_types = ["image/jpeg", "image/png", "image/tiff", "image/bmp", "image/gif"]
+    if file.content_type not in allowed_types:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Invalid file type. Allowed types: {', '.join(allowed_types)}",
+        )
+
+    # Read file content
+    try:
+        image_data = await file.read()
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Failed to read uploaded file: {str(e)}",
+        )
+
+    # Process with OCR
+    ocr_service = OCRService()
+    try:
+        extracted_text = ocr_service.extract_text(image_data)
+        medications = ocr_service.parse_medications_from_text(extracted_text)
+    except OCRError as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=str(e),
+        )
+
+    # Convert to ParsedMedication format
+    return [
+        ParsedMedication(
+            drug_name=med.get("drug_name", ""),
+            strength=med.get("strength"),
+            frequency=med.get("directions"),
+            raw_text=med.get("raw_text", ""),
+        )
+        for med in medications
+    ]
+
+
+@router.post("/dictate", response_model=List[ParsedMedication])
+async def dictate_medications(
+    review_id: str,
+    file: UploadFile = File(...),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Transcribe medications from an uploaded audio file.
+
+    Supports common audio formats: WebM, MP3, WAV, M4A, OGG.
+    """
+    get_review_or_404(review_id, current_user.id, db)
+
+    # Validate file type
+    allowed_types = [
+        "audio/webm", "audio/mp3", "audio/mpeg", "audio/wav",
+        "audio/x-wav", "audio/m4a", "audio/mp4", "audio/ogg",
+    ]
+    if file.content_type and file.content_type not in allowed_types:
+        # Be lenient with content types as browsers can be inconsistent
+        pass
+
+    # Read file content
+    try:
+        audio_data = await file.read()
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Failed to read uploaded file: {str(e)}",
+        )
+
+    # Process with transcription service
+    transcription_service = TranscriptionService()
+    try:
+        transcript = transcription_service.transcribe_audio(audio_data, file.filename or "audio.webm")
+        medications = transcription_service.parse_medications_from_transcript(transcript)
+    except TranscriptionError as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=str(e),
+        )
+
+    # Convert to ParsedMedication format
+    return [
+        ParsedMedication(
+            drug_name=med.get("drug_name", ""),
+            strength=med.get("strength"),
+            frequency=med.get("directions"),
+            raw_text=med.get("raw_text", ""),
+        )
+        for med in medications
+    ]
