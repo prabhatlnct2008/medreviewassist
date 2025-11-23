@@ -48,4 +48,21 @@ export const reportApi = {
     );
     return response.data;
   },
+
+  getPreviewPdfUrl: (reviewId: string): string => {
+    const baseUrl = apiClient.defaults.baseURL || '';
+    return `${baseUrl}/reviews/${reviewId}/report/preview/pdf`;
+  },
+
+  getDownloadPdfUrl: (reviewId: string): string => {
+    const baseUrl = apiClient.defaults.baseURL || '';
+    return `${baseUrl}/reviews/${reviewId}/report/download/pdf`;
+  },
+
+  downloadPdf: async (reviewId: string): Promise<Blob> => {
+    const response = await apiClient.get(`/reviews/${reviewId}/report/download/pdf`, {
+      responseType: 'blob',
+    });
+    return response.data;
+  },
 };

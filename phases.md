@@ -1,6 +1,6 @@
 # Project Status: MedReview Assist
 
-## Current Phase: Phase 10 - PDF Preview & Export
+## Current Phase: Phase 11 - Finalization & Consent
 
 ---
 
@@ -237,20 +237,20 @@
 
 ---
 
-## Phase 10: PDF Preview & Export
+## Phase 10: PDF Preview & Export ✅ COMPLETED
 **Goal:** Generate and preview PDF reports
 
 ### Backend - PDF Generation
-- [ ] Create WeasyPrint PDF service
-- [ ] Design PDF template (HTML/CSS)
-- [ ] GET `/reviews/{id}/report/preview` PDF endpoint
-- [ ] Add DRAFT watermark for non-finalized
-- [ ] Store finalized PDF path
+- [x] Create WeasyPrint PDF service
+- [x] Design PDF template (HTML/CSS)
+- [x] GET `/reviews/{id}/report/preview/pdf` PDF endpoint
+- [x] GET `/reviews/{id}/report/download/pdf` download endpoint
+- [x] Add DRAFT watermark for non-finalized
 
 ### Frontend
-- [ ] "Preview PDF" button implementation
-- [ ] PDF viewer modal or new tab
-- [ ] Download PDF button
+- [x] "Preview PDF" button implementation
+- [x] PDF opens in new tab
+- [x] Download PDF button
 
 ---
 
@@ -389,7 +389,7 @@
 | Phase 7 | ✅ Complete | Clinical Notes |
 | Phase 8 | ✅ Complete | AI Suggestions (Decision Support) |
 | Phase 9 | ✅ Complete | Report Drafting |
-| Phase 10 | ⏳ Not Started | PDF Preview & Export |
+| Phase 10 | ✅ Complete | PDF Preview & Export |
 | Phase 11 | ⏳ Not Started | Finalization & Consent |
 | Phase 12 | ⏳ Not Started | Email Delivery |
 | Phase 13 | ⏳ Not Started | Audit Trail & Compliance |

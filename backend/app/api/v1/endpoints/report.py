@@ -1,6 +1,7 @@
 """Report draft API endpoints."""
 from typing import Dict, Any, Optional
 from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.responses import Response
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
 
@@ -8,6 +9,7 @@ from app.core.database import get_db
 from app.core.deps import get_current_user
 from app.models import User, Review, ReportDraft
 from app.services.report_service import ReportService
+from app.services.pdf_service import PDFService
 
 router = APIRouter(prefix="/reviews/{review_id}/report", tags=["report"])
 
@@ -165,6 +167,103 @@ async def mark_section_reviewed(
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=str(e),
+        )
+
+
+@router.get("/preview/pdf")
+async def preview_pdf(
+    review_id: str,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Generate and return PDF preview of the report."""
+    review = db.query(Review).filter(
+        Review.id == review_id,
+        Review.pharmacist_id == current_user.id,
+    ).first()
+
+    if not review:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Review not found",
+        )
+
+    draft = db.query(ReportDraft).filter(ReportDraft.review_id == review_id).first()
+    if not draft:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Report draft not found. Generate a draft first.",
+        )
+
+    try:
+        pdf_service = PDFService(db)
+        pdf_bytes = pdf_service.generate_pdf(
+            review=review,
+            draft=draft,
+            is_draft=not draft.is_finalized
+        )
+
+        return Response(
+            content=pdf_bytes,
+            media_type="application/pdf",
+            headers={
+                "Content-Disposition": f'inline; filename="report_{review_id}.pdf"'
+            }
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to generate PDF: {str(e)}",
+        )
+
+
+@router.get("/download/pdf")
+async def download_pdf(
+    review_id: str,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Generate and download PDF of the report."""
+    review = db.query(Review).filter(
+        Review.id == review_id,
+        Review.pharmacist_id == current_user.id,
+    ).first()
+
+    if not review:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Review not found",
+        )
+
+    draft = db.query(ReportDraft).filter(ReportDraft.review_id == review_id).first()
+    if not draft:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Report draft not found. Generate a draft first.",
+        )
+
+    try:
+        pdf_service = PDFService(db)
+        pdf_bytes = pdf_service.generate_pdf(
+            review=review,
+            draft=draft,
+            is_draft=not draft.is_finalized
+        )
+
+        patient_name = review.patient.full_name.replace(' ', '_')
+        filename = f"MedReview_{patient_name}_{review.review_type.value.upper()}.pdf"
+
+        return Response(
+            content=pdf_bytes,
+            media_type="application/pdf",
+            headers={
+                "Content-Disposition": f'attachment; filename="{filename}"'
+            }
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to generate PDF: {str(e)}",
         )
 
 

@@ -2,7 +2,9 @@ import { useState, useEffect, useCallback } from 'react';
 import { useReportDraft, useGenerateReportDraft, useUpdateReportSection, useMarkSectionReviewed } from '@/hooks/useReport';
 import { useAISuggestions } from '@/hooks/useAISuggestions';
 import { Button, Card, Spinner } from '@/components/ui';
-import { FileText, RefreshCw, Check, ChevronRight, AlertTriangle, AlertCircle, Info, ClipboardCopy } from 'lucide-react';
+import { FileText, RefreshCw, Check, ChevronRight, AlertTriangle, AlertCircle, Info, ClipboardCopy, Eye, Download } from 'lucide-react';
+import { reportApi } from '@/api/report';
+import { useAuthStore } from '@/stores/authStore';
 import { debounce } from '@/utils/debounce';
 import { AISuggestion, SuggestionSeverity } from '@/types';
 
@@ -159,11 +161,50 @@ export function ReportDraftTab({ reviewId, onSave }: ReportDraftTabProps) {
           })}
         </div>
 
-        <div className="mt-4 pt-4 border-t">
+        <div className="mt-4 pt-4 border-t space-y-2">
           <Button variant="outline" size="sm" onClick={handleGenerate} isLoading={generateMutation.isPending} className="w-full">
             <RefreshCw className="mr-2 h-4 w-4" />
             Regenerate Draft
           </Button>
+
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              className="flex-1"
+              onClick={() => {
+                const token = useAuthStore.getState().accessToken;
+                const url = `${reportApi.getPreviewPdfUrl(reviewId)}?token=${token}`;
+                window.open(url, '_blank');
+              }}
+            >
+              <Eye className="mr-1 h-4 w-4" />
+              Preview
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              className="flex-1"
+              onClick={async () => {
+                try {
+                  const blob = await reportApi.downloadPdf(reviewId);
+                  const url = window.URL.createObjectURL(blob);
+                  const a = document.createElement('a');
+                  a.href = url;
+                  a.download = `MedReview_Report.pdf`;
+                  document.body.appendChild(a);
+                  a.click();
+                  window.URL.revokeObjectURL(url);
+                  document.body.removeChild(a);
+                } catch (error) {
+                  console.error('Failed to download PDF:', error);
+                }
+              }}
+            >
+              <Download className="mr-1 h-4 w-4" />
+              Download
+            </Button>
+          </div>
         </div>
       </div>
 
