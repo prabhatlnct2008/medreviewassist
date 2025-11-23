@@ -4,7 +4,8 @@ import { useEffect } from 'react';
 import { useAuthStore } from '@/store/authStore';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { ProtectedRoute } from '@/components/common/ProtectedRoute';
-import { LoadingScreen } from '@/components/ui';
+import { ErrorBoundary } from '@/components/common/ErrorBoundary';
+import { LoadingScreen, ToastContainer } from '@/components/ui';
 
 // Pages
 import { LoginPage } from '@/features/auth/pages/LoginPage';
@@ -76,11 +77,14 @@ function AppContent() {
 
 function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        <AppContent />
-      </BrowserRouter>
-    </QueryClientProvider>
+    <ErrorBoundary>
+      <QueryClientProvider client={queryClient}>
+        <BrowserRouter>
+          <AppContent />
+          <ToastContainer />
+        </BrowserRouter>
+      </QueryClientProvider>
+    </ErrorBoundary>
   );
 }
 
