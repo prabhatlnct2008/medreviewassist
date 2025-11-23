@@ -11,6 +11,8 @@ import { LoginPage } from '@/features/auth/pages/LoginPage';
 import { SignupPage } from '@/features/auth/pages/SignupPage';
 import { OnboardingPage } from '@/features/auth/pages/OnboardingPage';
 import { DashboardPage } from '@/features/dashboard/pages/DashboardPage';
+import { PatientsPage } from '@/features/patients/pages/PatientsPage';
+import { NewReviewPage } from '@/features/reviews/pages/NewReviewPage';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -57,8 +59,10 @@ function AppContent() {
         }
       >
         <Route path="/dashboard" element={<DashboardPage />} />
-        <Route path="/patients" element={<div>Patients Page (Coming Soon)</div>} />
-        <Route path="/settings" element={<div>Settings Page (Coming Soon)</div>} />
+        <Route path="/patients" element={<PatientsPage />} />
+        <Route path="/reviews/new" element={<NewReviewPage />} />
+        <Route path="/reviews/:id" element={<div className="p-8 text-center text-muted-foreground">Review Workspace (Coming in Phase 5)</div>} />
+        <Route path="/settings" element={<div className="p-8 text-center text-muted-foreground">Settings (Coming in Phase 15)</div>} />
       </Route>
 
       {/* Default redirect */}
