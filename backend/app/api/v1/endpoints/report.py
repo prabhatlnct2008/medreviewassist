@@ -11,6 +11,7 @@ from app.core.deps import get_current_user
 from app.models import User, Review, ReportDraft, Consent, ReviewStatus
 from app.services.report_service import ReportService
 from app.services.pdf_service import PDFService
+from app.services.email_service import EmailService
 
 router = APIRouter(prefix="/reviews/{review_id}/report", tags=["report"])
 
@@ -41,6 +42,10 @@ class FinalizeRequest(BaseModel):
     delivery_method: str = "email"  # email, print, both
     pharmacist_signature: str = ""
     consent_confirmed: bool = False
+
+
+class SendEmailRequest(BaseModel):
+    recipient_email: Optional[str] = None  # Override GP email if provided
 
 
 @router.post("/generate", response_model=ReportDraftResponse)
@@ -394,6 +399,62 @@ async def reopen_report(
     db.refresh(draft)
 
     return _format_draft_response(draft)
+
+
+@router.post("/send")
+async def send_report_email(
+    review_id: str,
+    send_data: SendEmailRequest,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Send finalized report via email to GP."""
+    review = db.query(Review).filter(
+        Review.id == review_id,
+        Review.pharmacist_id == current_user.id,
+    ).first()
+
+    if not review:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Review not found",
+        )
+
+    if review.status != ReviewStatus.SUBMITTED:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Can only send finalized reports",
+        )
+
+    draft = db.query(ReportDraft).filter(ReportDraft.review_id == review_id).first()
+    if not draft:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Report draft not found",
+        )
+
+    # Check if PDF exists
+    if not draft.pdf_path:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="No PDF available. Please finalize the report first.",
+        )
+
+    # Send email
+    email_service = EmailService()
+    result = email_service.send_report(
+        review=review,
+        pdf_path=draft.pdf_path,
+        recipient_email=send_data.recipient_email,
+    )
+
+    if not result.get("success"):
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=result.get("error", "Failed to send email"),
+        )
+
+    return result
 
 
 def _format_draft_response(draft: ReportDraft) -> dict:

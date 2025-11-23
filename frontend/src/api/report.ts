@@ -25,6 +25,18 @@ export interface FinalizeRequest {
   consent_confirmed: boolean;
 }
 
+export interface SendEmailRequest {
+  recipient_email?: string;
+}
+
+export interface SendEmailResponse {
+  success: boolean;
+  recipient?: string;
+  sent_at?: string;
+  mock?: boolean;
+  message?: string;
+}
+
 export const reportApi = {
   generateDraft: async (reviewId: string): Promise<ReportDraft> => {
     const response = await apiClient.post<ReportDraft>(`/reviews/${reviewId}/report/generate`);
@@ -83,6 +95,14 @@ export const reportApi = {
   reopenReport: async (reviewId: string): Promise<ReportDraft> => {
     const response = await apiClient.post<ReportDraft>(
       `/reviews/${reviewId}/report/reopen`
+    );
+    return response.data;
+  },
+
+  sendEmail: async (reviewId: string, data: SendEmailRequest = {}): Promise<SendEmailResponse> => {
+    const response = await apiClient.post<SendEmailResponse>(
+      `/reviews/${reviewId}/report/send`,
+      data
     );
     return response.data;
   },

@@ -1,9 +1,9 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useReportDraft, useGenerateReportDraft, useUpdateReportSection, useMarkSectionReviewed, useFinalizeReport, useReopenReport } from '@/hooks/useReport';
+import { useReportDraft, useGenerateReportDraft, useUpdateReportSection, useMarkSectionReviewed, useFinalizeReport, useReopenReport, useSendReportEmail } from '@/hooks/useReport';
 import { useAISuggestions } from '@/hooks/useAISuggestions';
 import { useConsent, useUpdateConsent } from '@/hooks/useConsent';
 import { Button, Card, Spinner } from '@/components/ui';
-import { FileText, RefreshCw, Check, ChevronRight, AlertTriangle, AlertCircle, Info, ClipboardCopy, Eye, Download, Lock, Unlock } from 'lucide-react';
+import { FileText, RefreshCw, Check, ChevronRight, AlertTriangle, AlertCircle, Info, ClipboardCopy, Eye, Download, Lock, Unlock, Mail } from 'lucide-react';
 import { reportApi } from '@/api/report';
 import { useAuthStore } from '@/stores/authStore';
 import { debounce } from '@/utils/debounce';
@@ -42,11 +42,13 @@ export function ReportDraftTab({ reviewId, onSave }: ReportDraftTabProps) {
   const finalizeMutation = useFinalizeReport(reviewId);
   const reopenMutation = useReopenReport(reviewId);
   const updateConsentMutation = useUpdateConsent(reviewId);
+  const sendEmailMutation = useSendReportEmail(reviewId);
 
   const [activeSection, setActiveSection] = useState('patient_details');
   const [editedContent, setEditedContent] = useState('');
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [showFinalizeModal, setShowFinalizeModal] = useState(false);
+  const [emailSent, setEmailSent] = useState(false);
 
   // Get current section content
   const currentSectionData = draft?.sections?.[activeSection];
@@ -110,6 +112,15 @@ export function ReportDraftTab({ reviewId, onSave }: ReportDraftTabProps) {
 
   const handleToggleConsent = () => {
     updateConsentMutation.mutate({ obtained: !consent?.obtained });
+  };
+
+  const handleSendEmail = async () => {
+    try {
+      await sendEmailMutation.mutateAsync({});
+      setEmailSent(true);
+    } catch (error) {
+      console.error('Failed to send email:', error);
+    }
   };
 
   // Filter included suggestions
@@ -244,16 +255,29 @@ export function ReportDraftTab({ reviewId, onSave }: ReportDraftTabProps) {
 
           {/* Finalize / Reopen Button */}
           {draft?.is_finalized ? (
-            <Button
-              variant="outline"
-              size="sm"
-              className="w-full"
-              onClick={handleReopen}
-              isLoading={reopenMutation.isPending}
-            >
-              <Unlock className="mr-1 h-4 w-4" />
-              Reopen for Amendment
-            </Button>
+            <>
+              <Button
+                variant="outline"
+                size="sm"
+                className="w-full"
+                onClick={handleReopen}
+                isLoading={reopenMutation.isPending}
+              >
+                <Unlock className="mr-1 h-4 w-4" />
+                Reopen for Amendment
+              </Button>
+              <Button
+                variant={emailSent ? 'outline' : 'primary'}
+                size="sm"
+                className="w-full"
+                onClick={handleSendEmail}
+                isLoading={sendEmailMutation.isPending}
+                disabled={emailSent}
+              >
+                <Mail className="mr-1 h-4 w-4" />
+                {emailSent ? 'Email Sent' : 'Send to GP'}
+              </Button>
+            </>
           ) : (
             <Button
               size="sm"

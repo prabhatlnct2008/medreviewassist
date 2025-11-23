@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { reportApi, SectionUpdateRequest, FinalizeRequest } from '@/api/report';
+import { reportApi, SectionUpdateRequest, FinalizeRequest, SendEmailRequest } from '@/api/report';
 
 export function useReportDraft(reviewId: string) {
   return useQuery({
@@ -64,5 +64,11 @@ export function useReopenReport(reviewId: string) {
       queryClient.invalidateQueries({ queryKey: ['reportDraft', reviewId] });
       queryClient.invalidateQueries({ queryKey: ['review', reviewId] });
     },
+  });
+}
+
+export function useSendReportEmail(reviewId: string) {
+  return useMutation({
+    mutationFn: (data?: SendEmailRequest) => reportApi.sendEmail(reviewId, data),
   });
 }
