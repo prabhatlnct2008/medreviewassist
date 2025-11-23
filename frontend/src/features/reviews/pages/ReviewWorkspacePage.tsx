@@ -5,6 +5,7 @@ import { Button, Card, Spinner } from '@/components/ui';
 import { ArrowLeft, Pill, FileText, Brain, ClipboardList, Save } from 'lucide-react';
 import { MedicationsTab } from '../components/workspace/MedicationsTab';
 import { SymptomsTab } from '../components/workspace/SymptomsTab';
+import { AISummaryTab } from '../components/workspace/AISummaryTab';
 import { format } from 'date-fns';
 
 type TabId = 'medications' | 'symptoms' | 'ai-summary' | 'report';
@@ -119,11 +120,7 @@ export function ReviewWorkspacePage() {
           <SymptomsTab reviewId={review.id} onSave={() => setLastSaved(new Date())} />
         )}
         {activeTab === 'ai-summary' && (
-          <Card className="p-8 text-center">
-            <Brain className="mx-auto h-12 w-12 text-muted-foreground" />
-            <h3 className="mt-4 text-lg font-medium">AI Summary</h3>
-            <p className="mt-2 text-muted-foreground">Coming in Phase 8</p>
-          </Card>
+          <AISummaryTab reviewId={review.id} />
         )}
         {activeTab === 'report' && (
           <Card className="p-8 text-center">

@@ -8,6 +8,7 @@ from app.api.v1.endpoints import (
     medications,
     clinical_notes,
     consent,
+    ai_suggestions,
 )
 
 api_router = APIRouter()
@@ -20,3 +21,4 @@ api_router.include_router(reviews.router)
 api_router.include_router(medications.router)
 api_router.include_router(clinical_notes.router)
 api_router.include_router(consent.router)
+api_router.include_router(ai_suggestions.router)

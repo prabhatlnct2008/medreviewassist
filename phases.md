@@ -1,6 +1,6 @@
 # Project Status: MedReview Assist
 
-## Current Phase: Phase 6 - OCR & Advanced Input
+## Current Phase: Phase 9 - Report Drafting
 
 ---
 
@@ -192,28 +192,28 @@
 
 ---
 
-## Phase 8: AI Suggestions (Decision Support)
+## Phase 8: AI Suggestions (Decision Support) ✅ COMPLETED
 **Goal:** Generate and display AI-powered clinical suggestions
 
 ### Backend - AI Integration
-- [ ] Create OpenAI service client
-- [ ] Design clinical analysis prompt template
-- [ ] POST `/reviews/{id}/ai/generate` endpoint
-- [ ] Parse OpenAI response into AISuggestion objects
-- [ ] GET `/reviews/{id}/ai/suggestions` list
-- [ ] PUT `/reviews/{id}/ai/suggestions/{id}` update
+- [x] Create OpenAI service client
+- [x] Design clinical analysis prompt template
+- [x] POST `/reviews/{id}/ai/generate` endpoint
+- [x] Parse OpenAI response into AISuggestion objects
+- [x] GET `/reviews/{id}/ai/suggestions` list
+- [x] PUT `/reviews/{id}/ai/suggestions/{id}` update
 
 ### Frontend - AI Summary Tab
-- [ ] Create AISummaryTab layout (two-panel)
-- [ ] Create disclaimer banner
-- [ ] Create IssuesList component with severity badges
-- [ ] Create IssueDetail component
-- [ ] Display involved medications
-- [ ] Display clinical rationale
-- [ ] Display evidence summary
-- [ ] Show suggested report text
-- [ ] "Include in draft" checkbox
-- [ ] "Insert into report" button
+- [x] Create AISummaryTab layout (two-panel)
+- [x] Create disclaimer banner
+- [x] Create IssuesList component with severity badges
+- [x] Create IssueDetail component
+- [x] Display involved medications
+- [x] Display clinical rationale
+- [x] Display evidence summary
+- [x] Show suggested report text
+- [x] "Include in draft" checkbox
+- [x] "Insert into report" button
 
 ---
 
@@ -387,7 +387,7 @@
 | Phase 5 | ✅ Complete | Medications Input |
 | Phase 6 | ⏳ Not Started | OCR & Dictation Input |
 | Phase 7 | ✅ Complete | Clinical Notes |
-| Phase 8 | ⏳ Not Started | AI Suggestions (Decision Support) |
+| Phase 8 | ✅ Complete | AI Suggestions (Decision Support) |
 | Phase 9 | ⏳ Not Started | Report Drafting |
 | Phase 10 | ⏳ Not Started | PDF Preview & Export |
 | Phase 11 | ⏳ Not Started | Finalization & Consent |
