@@ -1,12 +1,14 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useReportDraft, useGenerateReportDraft, useUpdateReportSection, useMarkSectionReviewed } from '@/hooks/useReport';
+import { useReportDraft, useGenerateReportDraft, useUpdateReportSection, useMarkSectionReviewed, useFinalizeReport, useReopenReport } from '@/hooks/useReport';
 import { useAISuggestions } from '@/hooks/useAISuggestions';
+import { useConsent, useUpdateConsent } from '@/hooks/useConsent';
 import { Button, Card, Spinner } from '@/components/ui';
-import { FileText, RefreshCw, Check, ChevronRight, AlertTriangle, AlertCircle, Info, ClipboardCopy, Eye, Download } from 'lucide-react';
+import { FileText, RefreshCw, Check, ChevronRight, AlertTriangle, AlertCircle, Info, ClipboardCopy, Eye, Download, Lock, Unlock } from 'lucide-react';
 import { reportApi } from '@/api/report';
 import { useAuthStore } from '@/stores/authStore';
 import { debounce } from '@/utils/debounce';
 import { AISuggestion, SuggestionSeverity } from '@/types';
+import { FinalizeModal } from './FinalizeModal';
 
 interface ReportDraftTabProps {
   reviewId: string;
@@ -33,13 +35,18 @@ const severityConfig: Record<SuggestionSeverity, { icon: typeof AlertTriangle; c
 export function ReportDraftTab({ reviewId, onSave }: ReportDraftTabProps) {
   const { data: draft, isLoading } = useReportDraft(reviewId);
   const { data: suggestions } = useAISuggestions(reviewId);
+  const { data: consent } = useConsent(reviewId);
   const generateMutation = useGenerateReportDraft(reviewId);
   const updateMutation = useUpdateReportSection(reviewId);
   const markReviewedMutation = useMarkSectionReviewed(reviewId);
+  const finalizeMutation = useFinalizeReport(reviewId);
+  const reopenMutation = useReopenReport(reviewId);
+  const updateConsentMutation = useUpdateConsent(reviewId);
 
   const [activeSection, setActiveSection] = useState('patient_details');
   const [editedContent, setEditedContent] = useState('');
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [showFinalizeModal, setShowFinalizeModal] = useState(false);
 
   // Get current section content
   const currentSectionData = draft?.sections?.[activeSection];
@@ -86,6 +93,23 @@ export function ReportDraftTab({ reviewId, onSave }: ReportDraftTabProps) {
     const textToInsert = suggestion.suggested_text || suggestion.description;
     const newContent = editedContent ? `${editedContent}\n\n${textToInsert}` : textToInsert;
     handleContentChange(newContent);
+  };
+
+  const handleFinalize = async (data: { delivery_method: string; pharmacist_signature: string; consent_confirmed: boolean }) => {
+    await finalizeMutation.mutateAsync({
+      delivery_method: data.delivery_method as 'email' | 'print' | 'both',
+      pharmacist_signature: data.pharmacist_signature,
+      consent_confirmed: data.consent_confirmed,
+    });
+    setShowFinalizeModal(false);
+  };
+
+  const handleReopen = async () => {
+    await reopenMutation.mutateAsync();
+  };
+
+  const handleToggleConsent = () => {
+    updateConsentMutation.mutate({ obtained: !consent?.obtained });
   };
 
   // Filter included suggestions
@@ -205,6 +229,41 @@ export function ReportDraftTab({ reviewId, onSave }: ReportDraftTabProps) {
               Download
             </Button>
           </div>
+
+          {/* Consent Toggle */}
+          <Button
+            variant={consent?.obtained ? 'primary' : 'outline'}
+            size="sm"
+            className="w-full"
+            onClick={handleToggleConsent}
+            disabled={draft?.is_finalized || updateConsentMutation.isPending}
+          >
+            <Check className="mr-1 h-4 w-4" />
+            {consent?.obtained ? 'Consent Obtained' : 'Mark Consent Obtained'}
+          </Button>
+
+          {/* Finalize / Reopen Button */}
+          {draft?.is_finalized ? (
+            <Button
+              variant="outline"
+              size="sm"
+              className="w-full"
+              onClick={handleReopen}
+              isLoading={reopenMutation.isPending}
+            >
+              <Unlock className="mr-1 h-4 w-4" />
+              Reopen for Amendment
+            </Button>
+          ) : (
+            <Button
+              size="sm"
+              className="w-full"
+              onClick={() => setShowFinalizeModal(true)}
+            >
+              <Lock className="mr-1 h-4 w-4" />
+              Finalize Report
+            </Button>
+          )}
         </div>
       </div>
 
@@ -285,6 +344,17 @@ export function ReportDraftTab({ reviewId, onSave }: ReportDraftTabProps) {
           </div>
         )}
       </div>
+
+      {/* Finalize Modal */}
+      <FinalizeModal
+        isOpen={showFinalizeModal}
+        onClose={() => setShowFinalizeModal(false)}
+        onFinalize={handleFinalize}
+        isPending={finalizeMutation.isPending}
+        reviewedCount={reviewedCount}
+        totalSections={totalSections}
+        hasConsent={consent?.obtained || false}
+      />
     </div>
   );
 }

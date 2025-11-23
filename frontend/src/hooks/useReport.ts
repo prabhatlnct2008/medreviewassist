@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { reportApi, SectionUpdateRequest } from '@/api/report';
+import { reportApi, SectionUpdateRequest, FinalizeRequest } from '@/api/report';
 
 export function useReportDraft(reviewId: string) {
   return useQuery({
@@ -39,6 +39,30 @@ export function useMarkSectionReviewed(reviewId: string) {
     mutationFn: (section: string) => reportApi.markSectionReviewed(reviewId, section),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['reportDraft', reviewId] });
+    },
+  });
+}
+
+export function useFinalizeReport(reviewId: string) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (data: FinalizeRequest) => reportApi.finalizeReport(reviewId, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['reportDraft', reviewId] });
+      queryClient.invalidateQueries({ queryKey: ['review', reviewId] });
+    },
+  });
+}
+
+export function useReopenReport(reviewId: string) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: () => reportApi.reopenReport(reviewId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['reportDraft', reviewId] });
+      queryClient.invalidateQueries({ queryKey: ['review', reviewId] });
     },
   });
 }

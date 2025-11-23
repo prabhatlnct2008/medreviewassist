@@ -5,9 +5,10 @@ from fastapi.responses import Response
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
 
+from datetime import datetime
 from app.core.database import get_db
 from app.core.deps import get_current_user
-from app.models import User, Review, ReportDraft
+from app.models import User, Review, ReportDraft, Consent, ReviewStatus
 from app.services.report_service import ReportService
 from app.services.pdf_service import PDFService
 
@@ -34,6 +35,12 @@ class ReportDraftResponse(BaseModel):
 class SectionUpdateRequest(BaseModel):
     content: str
     reviewed: bool = False
+
+
+class FinalizeRequest(BaseModel):
+    delivery_method: str = "email"  # email, print, both
+    pharmacist_signature: str = ""
+    consent_confirmed: bool = False
 
 
 @router.post("/generate", response_model=ReportDraftResponse)
@@ -265,6 +272,128 @@ async def download_pdf(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to generate PDF: {str(e)}",
         )
+
+
+@router.post("/finalize", response_model=ReportDraftResponse)
+async def finalize_report(
+    review_id: str,
+    finalize_data: FinalizeRequest,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Finalize the report and lock it from further edits."""
+    review = db.query(Review).filter(
+        Review.id == review_id,
+        Review.pharmacist_id == current_user.id,
+    ).first()
+
+    if not review:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Review not found",
+        )
+
+    # Check if already submitted
+    if review.status == ReviewStatus.SUBMITTED:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Review has already been finalized",
+        )
+
+    # Get draft
+    draft = db.query(ReportDraft).filter(ReportDraft.review_id == review_id).first()
+    if not draft:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Report draft not found. Generate a draft first.",
+        )
+
+    # Check consent is obtained
+    consent = db.query(Consent).filter(Consent.review_id == review_id).first()
+    if not consent or not consent.obtained:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Patient consent must be obtained before finalizing",
+        )
+
+    # Verify all sections are reviewed
+    sections = draft.sections or {}
+    unreviewed = [k for k, v in sections.items() if not v.get('reviewed', False)]
+    if unreviewed:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"The following sections have not been reviewed: {', '.join(unreviewed)}",
+        )
+
+    # Add pharmacist signature to sign-off section
+    if finalize_data.pharmacist_signature:
+        sections['pharmacist_signoff'] = {
+            'content': f"Signed: {current_user.full_name}\n{finalize_data.pharmacist_signature}\nDate: {datetime.utcnow().strftime('%d/%m/%Y %H:%M')}",
+            'reviewed': True,
+        }
+        draft.sections = sections
+
+    # Generate final PDF
+    try:
+        pdf_service = PDFService(db)
+        pdf_bytes = pdf_service.generate_pdf(review, draft, is_draft=False)
+        pdf_path = pdf_service.save_pdf(pdf_bytes, review_id, is_final=True)
+        draft.pdf_path = pdf_path
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to generate final PDF: {str(e)}",
+        )
+
+    # Finalize
+    draft.is_finalized = True
+    review.status = ReviewStatus.SUBMITTED
+
+    db.commit()
+    db.refresh(draft)
+
+    return _format_draft_response(draft)
+
+
+@router.post("/reopen")
+async def reopen_report(
+    review_id: str,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Reopen a finalized report for amendments."""
+    review = db.query(Review).filter(
+        Review.id == review_id,
+        Review.pharmacist_id == current_user.id,
+    ).first()
+
+    if not review:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Review not found",
+        )
+
+    if review.status != ReviewStatus.SUBMITTED:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Only submitted reviews can be reopened",
+        )
+
+    draft = db.query(ReportDraft).filter(ReportDraft.review_id == review_id).first()
+    if not draft:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Report draft not found",
+        )
+
+    # Reopen
+    draft.is_finalized = False
+    review.status = ReviewStatus.IN_PROGRESS
+
+    db.commit()
+    db.refresh(draft)
+
+    return _format_draft_response(draft)
 
 
 def _format_draft_response(draft: ReportDraft) -> dict:

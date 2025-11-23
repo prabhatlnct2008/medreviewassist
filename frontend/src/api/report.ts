@@ -19,6 +19,12 @@ export interface SectionUpdateRequest {
   reviewed?: boolean;
 }
 
+export interface FinalizeRequest {
+  delivery_method: 'email' | 'print' | 'both';
+  pharmacist_signature: string;
+  consent_confirmed: boolean;
+}
+
 export const reportApi = {
   generateDraft: async (reviewId: string): Promise<ReportDraft> => {
     const response = await apiClient.post<ReportDraft>(`/reviews/${reviewId}/report/generate`);
@@ -63,6 +69,21 @@ export const reportApi = {
     const response = await apiClient.get(`/reviews/${reviewId}/report/download/pdf`, {
       responseType: 'blob',
     });
+    return response.data;
+  },
+
+  finalizeReport: async (reviewId: string, data: FinalizeRequest): Promise<ReportDraft> => {
+    const response = await apiClient.post<ReportDraft>(
+      `/reviews/${reviewId}/report/finalize`,
+      data
+    );
+    return response.data;
+  },
+
+  reopenReport: async (reviewId: string): Promise<ReportDraft> => {
+    const response = await apiClient.post<ReportDraft>(
+      `/reviews/${reviewId}/report/reopen`
+    );
     return response.data;
   },
 };

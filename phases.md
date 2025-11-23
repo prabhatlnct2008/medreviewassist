@@ -1,6 +1,6 @@
 # Project Status: MedReview Assist
 
-## Current Phase: Phase 11 - Finalization & Consent
+## Current Phase: Phase 12 - Email Delivery
 
 ---
 
@@ -254,23 +254,24 @@
 
 ---
 
-## Phase 11: Finalization & Consent
+## Phase 11: Finalization & Consent ✅ COMPLETED
 **Goal:** Complete review finalization flow with compliance
 
 ### Backend
-- [ ] GET/PUT `/reviews/{id}/consent` endpoints
-- [ ] POST `/reviews/{id}/report/finalize` endpoint
-- [ ] Lock review after finalization
-- [ ] Store immutable PDF snapshot
-- [ ] Update review status to SUBMITTED
+- [x] GET/PUT `/reviews/{id}/consent` endpoints
+- [x] POST `/reviews/{id}/report/finalize` endpoint
+- [x] POST `/reviews/{id}/report/reopen` endpoint
+- [x] Lock review after finalization
+- [x] Store immutable PDF snapshot
+- [x] Update review status to SUBMITTED
 
 ### Frontend
-- [ ] Create ConsentPanel component
-- [ ] Create FinalizeModal with checklist
-- [ ] Signature block display
-- [ ] Delivery method selection
-- [ ] Confirmation checkbox
-- [ ] Post-finalization: lock editing
+- [x] Consent toggle button
+- [x] Create FinalizeModal with checklist
+- [x] Digital signature input
+- [x] Delivery method selection
+- [x] Confirmation checkbox
+- [x] Post-finalization: reopen option
 
 ---
 
@@ -390,7 +391,7 @@
 | Phase 8 | ✅ Complete | AI Suggestions (Decision Support) |
 | Phase 9 | ✅ Complete | Report Drafting |
 | Phase 10 | ✅ Complete | PDF Preview & Export |
-| Phase 11 | ⏳ Not Started | Finalization & Consent |
+| Phase 11 | ✅ Complete | Finalization & Consent |
 | Phase 12 | ⏳ Not Started | Email Delivery |
 | Phase 13 | ⏳ Not Started | Audit Trail & Compliance |
 | Phase 14 | ⏳ Not Started | Reopen & Amendment |
