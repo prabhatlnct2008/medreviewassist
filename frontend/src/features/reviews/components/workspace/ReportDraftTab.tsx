@@ -5,7 +5,7 @@ import { useConsent, useUpdateConsent } from '@/hooks/useConsent';
 import { Button, Card, Spinner } from '@/components/ui';
 import { FileText, RefreshCw, Check, ChevronRight, AlertTriangle, AlertCircle, Info, ClipboardCopy, Eye, Download, Lock, Unlock, Mail } from 'lucide-react';
 import { reportApi } from '@/api/report';
-import { useAuthStore } from '@/stores/authStore';
+import { useAuthStore } from '@/store/authStore';
 import { debounce } from '@/utils/debounce';
 import { AISuggestion, SuggestionSeverity } from '@/types';
 import { FinalizeModal } from './FinalizeModal';
