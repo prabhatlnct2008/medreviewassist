@@ -20,6 +20,7 @@ from app.models.ai_suggestion import AISuggestion
 from app.models.report_draft import ReportDraft
 from app.models.consent import Consent
 from app.models.audit_log import AuditLog
+from app.models.user_settings import UserSettings
 
 __all__ = [
     "UUIDMixin",
@@ -43,4 +44,5 @@ __all__ = [
     "ReportDraft",
     "Consent",
     "AuditLog",
+    "UserSettings",
 ]

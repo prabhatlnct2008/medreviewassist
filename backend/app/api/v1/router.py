@@ -11,6 +11,7 @@ from app.api.v1.endpoints import (
     ai_suggestions,
     report,
     audit,
+    settings,
 )
 
 api_router = APIRouter()
@@ -26,3 +27,4 @@ api_router.include_router(consent.router)
 api_router.include_router(ai_suggestions.router)
 api_router.include_router(report.router)
 api_router.include_router(audit.router)
+api_router.include_router(settings.router)

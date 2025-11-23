@@ -43,3 +43,10 @@ from app.schemas.report import (
 )
 from app.schemas.consent import ConsentUpdate, ConsentResponse
 from app.schemas.audit import AuditLogResponse
+from app.schemas.settings import (
+    UserSettingsResponse,
+    UserSettingsUpdate,
+    TemplateUpdateRequest,
+    ResetTemplateRequest,
+    ProfileUpdateRequest,
+)

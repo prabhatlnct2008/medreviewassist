@@ -14,6 +14,7 @@ import { DashboardPage } from '@/features/dashboard/pages/DashboardPage';
 import { PatientsPage } from '@/features/patients/pages/PatientsPage';
 import { NewReviewPage } from '@/features/reviews/pages/NewReviewPage';
 import { ReviewWorkspacePage } from '@/features/reviews/pages/ReviewWorkspacePage';
+import { SettingsPage } from '@/features/settings/pages/SettingsPage';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -63,7 +64,7 @@ function AppContent() {
         <Route path="/patients" element={<PatientsPage />} />
         <Route path="/reviews/new" element={<NewReviewPage />} />
         <Route path="/reviews/:id" element={<ReviewWorkspacePage />} />
-        <Route path="/settings" element={<div className="p-8 text-center text-muted-foreground">Settings (Coming in Phase 15)</div>} />
+        <Route path="/settings" element={<SettingsPage />} />
       </Route>
 
       {/* Default redirect */}

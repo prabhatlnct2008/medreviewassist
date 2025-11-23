@@ -1,6 +1,6 @@
 # Project Status: MedReview Assist
 
-## Current Phase: Phase 15 - Settings & Templates
+## Current Phase: Phase 16 - Polish & QA
 
 ---
 
@@ -319,18 +319,21 @@
 
 ---
 
-## Phase 15: Settings & Templates
+## Phase 15: Settings & Templates ✅ COMPLETED
 **Goal:** User settings and report template management
 
 ### Backend
-- [ ] GET/PUT `/settings/templates` endpoints
-- [ ] Store default HMR/RMMR templates
+- [x] GET/PUT `/settings/templates` endpoints
+- [x] Store default HMR/RMMR templates
+- [x] UserSettings model for user preferences
+- [x] Profile and preferences API endpoints
 
 ### Frontend
-- [ ] Create SettingsPage with tabs
-- [ ] Profile settings form
-- [ ] Template editor (HMR, RMMR)
-- [ ] Reset to defaults option
+- [x] Create SettingsPage with tabs
+- [x] Profile settings form
+- [x] Template editor (HMR, RMMR)
+- [x] Reset to defaults option
+- [x] Preferences settings (auto-save, date format, etc.)
 
 ---
 
@@ -392,7 +395,7 @@
 | Phase 12 | ✅ Complete | Email Delivery |
 | Phase 13 | ✅ Complete | Audit Trail & Compliance |
 | Phase 14 | ✅ Complete | Reopen & Amendment |
-| Phase 15 | ⏳ Not Started | Settings & Templates |
+| Phase 15 | ✅ Complete | Settings & Templates |
 | Phase 16 | ⏳ Not Started | Polish & QA |
 
 ---
