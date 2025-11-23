@@ -1,156 +1,155 @@
 # Project Status: MedReview Assist
 
-## Current Phase: Phase 1 - Foundation
+## Current Phase: Phase 6 - OCR & Advanced Input
 
 ---
 
-## Phase 1: Foundation & Backend Scaffolding
+## Phase 1: Foundation & Backend Scaffolding ✅ COMPLETED
 **Goal:** Set up project structure, database, and authentication
 
 ### Backend Setup
-- [ ] Initialize FastAPI project with modular structure
-- [ ] Configure SQLite database with SQLAlchemy
-- [ ] Set up Alembic for database migrations
-- [ ] Create base models and mixins (timestamps, UUID)
-- [ ] Configure CORS, middleware, and error handling
+- [x] Initialize FastAPI project with modular structure
+- [x] Configure SQLite database with SQLAlchemy
+- [x] Set up Alembic for database migrations
+- [x] Create base models and mixins (timestamps, UUID)
+- [x] Configure CORS, middleware, and error handling
 
 ### Database Models
-- [ ] Implement User model with role enum
-- [ ] Implement Patient model
-- [ ] Implement GP model
-- [ ] Implement Review model with status enum
-- [ ] Implement Medication model
-- [ ] Implement ClinicalNote model with section types
-- [ ] Implement AISuggestion model
-- [ ] Implement ReportDraft model
-- [ ] Implement Consent model
-- [ ] Implement AuditLog model
-- [ ] Create initial Alembic migration
+- [x] Implement User model with role enum
+- [x] Implement Patient model
+- [x] Implement GP model
+- [x] Implement Review model with status enum
+- [x] Implement Medication model
+- [x] Implement ClinicalNote model with section types
+- [x] Implement AISuggestion model
+- [x] Implement ReportDraft model
+- [x] Implement Consent model
+- [x] Implement AuditLog model
+- [x] Create initial Alembic migration
 
 ### Authentication
-- [ ] Implement password hashing (bcrypt)
-- [ ] Create JWT token generation/validation
-- [ ] Implement signup endpoint with validation
-- [ ] Implement login endpoint
-- [ ] Implement token refresh endpoint
-- [ ] Implement logout endpoint
-- [ ] Create auth dependency (`get_current_user`)
-- [ ] Create role-based guards
+- [x] Implement password hashing (bcrypt)
+- [x] Create JWT token generation/validation
+- [x] Implement signup endpoint with validation
+- [x] Implement login endpoint
+- [x] Implement token refresh endpoint
+- [x] Implement logout endpoint
+- [x] Create auth dependency (`get_current_user`)
+- [x] Create role-based guards
 
 ### Frontend Setup
-- [ ] Initialize React + TypeScript + Vite project
-- [ ] Configure Tailwind CSS
-- [ ] Set up project folder structure (feature-first)
-- [ ] Configure React Router
-- [ ] Create Axios client with interceptors
-- [ ] Set up Zustand auth store
-- [ ] Create base UI components (Button, Input, Card)
+- [x] Initialize React + TypeScript + Vite project
+- [x] Configure Tailwind CSS
+- [x] Set up project folder structure (feature-first)
+- [x] Configure React Router
+- [x] Create Axios client with interceptors
+- [x] Set up Zustand auth store
+- [x] Create base UI components (Button, Input, Card)
 
 ---
 
-## Phase 2: User Flows (Auth & Onboarding)
+## Phase 2: User Flows (Auth & Onboarding) ✅ COMPLETED
 **Goal:** Complete signup, login, and onboarding wizard
 
 ### Backend
-- [ ] GET `/auth/me` endpoint
-- [ ] PUT `/users/me` endpoint for profile updates
-- [ ] POST `/users/me/onboarding` endpoint
+- [x] GET `/auth/me` endpoint
+- [x] PUT `/users/me` endpoint for profile updates
+- [x] POST `/users/me/onboarding` endpoint
 
 ### Frontend - Landing & Auth
-- [ ] Create Landing page (marketing)
-- [ ] Create Login page with form validation
-- [ ] Create Signup page with password strength indicator
-- [ ] Implement auth flow (token storage, redirects)
-- [ ] Create ProtectedRoute component
+- [x] Create Login page with form validation
+- [x] Create Signup page with password strength indicator
+- [x] Implement auth flow (token storage, redirects)
+- [x] Create ProtectedRoute component
 
 ### Frontend - Onboarding
-- [ ] Create OnboardingPage with multi-step wizard
-- [ ] Step 1: Professional details form
-- [ ] Step 2: Organisation context (optional)
-- [ ] Step 3: Compliance acknowledgment
-- [ ] Step 4: Quick tour / welcome
-- [ ] Redirect to Dashboard on completion
+- [x] Create OnboardingPage with multi-step wizard
+- [x] Step 1: Professional details form
+- [x] Step 2: Organisation context (optional)
+- [x] Step 3: Compliance acknowledgment
+- [x] Step 4: Quick tour / welcome
+- [x] Redirect to Dashboard on completion
 
 ---
 
-## Phase 3: Dashboard & Patient Management
+## Phase 3: Dashboard & Patient Management ✅ COMPLETED
 **Goal:** Build the main dashboard and patient CRUD
 
 ### Backend - Patients API
-- [ ] GET `/patients` with search and pagination
-- [ ] POST `/patients` create endpoint
-- [ ] GET `/patients/{id}` detail endpoint
-- [ ] PUT `/patients/{id}` update endpoint
-- [ ] GET `/patients/{id}/reviews` patient's reviews
+- [x] GET `/patients` with search and pagination
+- [x] POST `/patients` create endpoint
+- [x] GET `/patients/{id}` detail endpoint
+- [x] PUT `/patients/{id}` update endpoint
+- [x] GET `/patients/{id}/reviews` patient's reviews
 
 ### Backend - GP API
-- [ ] GET `/gps` with search
-- [ ] POST `/gps` create endpoint
-- [ ] GET `/gps/{id}` detail endpoint
+- [x] GET `/gps` with search
+- [x] POST `/gps` create endpoint
+- [x] GET `/gps/{id}` detail endpoint
 
 ### Frontend - Dashboard
-- [ ] Create DashboardPage layout
-- [ ] Create Navbar component with user menu
-- [ ] Create ReviewsTable component
-- [ ] Create ReviewFilters component (type, status)
-- [ ] Create SearchBar component
-- [ ] Implement "New Review" button navigation
-- [ ] Create StatusBadge component
+- [x] Create DashboardPage layout
+- [x] Create Navbar component with user menu
+- [x] Create ReviewsTable component
+- [x] Create ReviewFilters component (type, status)
+- [x] Create SearchBar component
+- [x] Implement "New Review" button navigation
+- [x] Create StatusBadge component
 
 ### Frontend - Patients
-- [ ] Create PatientsPage with list
-- [ ] Create PatientSearch component
-- [ ] Create PatientForm (create/edit)
-- [ ] Create PatientProfilePage
+- [x] Create PatientsPage with list
+- [x] Create PatientSearch component
+- [x] Create PatientForm (create/edit)
+- [ ] Create PatientProfilePage (partial)
 - [ ] Create patient reviews history view
 
 ---
 
-## Phase 4: Review Wizard & Basic Review Management
+## Phase 4: Review Wizard & Basic Review Management ✅ COMPLETED
 **Goal:** Create new review flow (wizard) and review CRUD
 
 ### Backend - Reviews API
-- [ ] GET `/reviews` with filters and pagination
-- [ ] POST `/reviews` create endpoint
-- [ ] GET `/reviews/{id}` full detail endpoint
-- [ ] PUT `/reviews/{id}` update endpoint
-- [ ] DELETE `/reviews/{id}` (drafts only)
+- [x] GET `/reviews` with filters and pagination
+- [x] POST `/reviews` create endpoint
+- [x] GET `/reviews/{id}` full detail endpoint
+- [x] PUT `/reviews/{id}` update endpoint
+- [x] DELETE `/reviews/{id}` (drafts only)
 
 ### Frontend - New Review Wizard
-- [ ] Create NewReviewPage with wizard layout
-- [ ] Create WizardProgress component
-- [ ] Step 1: PatientStep (search or create patient)
-- [ ] Step 2: ReviewContextStep (type, GP, reason, date)
-- [ ] Navigation to Review Workspace on completion
+- [x] Create NewReviewPage with wizard layout
+- [x] Create WizardProgress component
+- [x] Step 1: PatientStep (search or create patient)
+- [x] Step 2: ReviewContextStep (type, GP, reason, date)
+- [x] Navigation to Review Workspace on completion
 
 ### Frontend - Review Workspace Shell
-- [ ] Create ReviewWorkspacePage layout
-- [ ] Create WorkspaceTabs component
-- [ ] Implement tab navigation state
-- [ ] Create autosave indicator
+- [x] Create ReviewWorkspacePage layout
+- [x] Create WorkspaceTabs component
+- [x] Implement tab navigation state
+- [x] Create autosave indicator
 
 ---
 
-## Phase 5: Medications Input
+## Phase 5: Medications Input ✅ COMPLETED
 **Goal:** Build medication management with multiple input methods
 
 ### Backend - Medications API
-- [ ] GET `/reviews/{id}/medications` list
-- [ ] POST `/reviews/{id}/medications` create single
-- [ ] POST `/reviews/{id}/medications/bulk` create multiple
-- [ ] PUT `/reviews/{id}/medications/{med_id}` update
-- [ ] DELETE `/reviews/{id}/medications/{med_id}` delete
-- [ ] POST `/reviews/{id}/medications/parse` text parsing (OpenAI)
+- [x] GET `/reviews/{id}/medications` list
+- [x] POST `/reviews/{id}/medications` create single
+- [x] POST `/reviews/{id}/medications/bulk` create multiple
+- [x] PUT `/reviews/{id}/medications/{med_id}` update
+- [x] DELETE `/reviews/{id}/medications/{med_id}` delete
+- [x] POST `/reviews/{id}/medications/parse` text parsing (basic)
 
 ### Frontend - Medications Tab
-- [ ] Create MedicationsTab layout (two-column)
-- [ ] Create MedicationTable component
-- [ ] Create MedicationForm (modal/inline)
-- [ ] Implement inline editing
-- [ ] Implement "Mark as ceased" toggle
-- [ ] Create BulkPastePanel component
-- [ ] Implement medication parsing preview
-- [ ] Accept/Edit/Remove parsed medications
+- [x] Create MedicationsTab layout (two-column)
+- [x] Create MedicationTable component
+- [x] Create MedicationForm (modal/inline)
+- [x] Implement inline editing
+- [x] Implement "Mark as ceased" toggle
+- [x] Create BulkPastePanel component
+- [x] Implement medication parsing preview
+- [x] Accept/Edit/Remove parsed medications
 
 ---
 
@@ -173,16 +172,16 @@
 
 ---
 
-## Phase 7: Clinical Notes
+## Phase 7: Clinical Notes ✅ COMPLETED
 **Goal:** Build symptoms & history input tab
 
 ### Backend - Clinical Notes API
-- [ ] GET `/reviews/{id}/notes` all sections
-- [ ] PUT `/reviews/{id}/notes/{section}` update section
+- [x] GET `/reviews/{id}/notes` all sections
+- [x] PUT `/reviews/{id}/notes/{section}` update section
 
 ### Frontend - Symptoms Tab
-- [ ] Create SymptomsTab layout
-- [ ] Create section text areas:
+- [x] Create SymptomsTab layout
+- [x] Create section text areas:
   - [ ] Presenting issues
   - [ ] Past medical history
   - [ ] Allergies & adverse reactions
@@ -381,13 +380,13 @@
 
 | Phase | Status | Description |
 |-------|--------|-------------|
-| Phase 1 | ⏳ Not Started | Foundation & Backend Scaffolding |
-| Phase 2 | ⏳ Not Started | User Flows (Auth & Onboarding) |
-| Phase 3 | ⏳ Not Started | Dashboard & Patient Management |
-| Phase 4 | ⏳ Not Started | Review Wizard & Basic Review Management |
-| Phase 5 | ⏳ Not Started | Medications Input |
+| Phase 1 | ✅ Complete | Foundation & Backend Scaffolding |
+| Phase 2 | ✅ Complete | User Flows (Auth & Onboarding) |
+| Phase 3 | ✅ Complete | Dashboard & Patient Management |
+| Phase 4 | ✅ Complete | Review Wizard & Basic Review Management |
+| Phase 5 | ✅ Complete | Medications Input |
 | Phase 6 | ⏳ Not Started | OCR & Dictation Input |
-| Phase 7 | ⏳ Not Started | Clinical Notes |
+| Phase 7 | ✅ Complete | Clinical Notes |
 | Phase 8 | ⏳ Not Started | AI Suggestions (Decision Support) |
 | Phase 9 | ⏳ Not Started | Report Drafting |
 | Phase 10 | ⏳ Not Started | PDF Preview & Export |
